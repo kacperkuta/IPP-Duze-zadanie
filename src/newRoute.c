@@ -2,6 +2,7 @@
 // Created by baka475 on 28.04.19.
 //
 #include <limits.h>
+#include <stdio.h>
 #include "structures.h"
 #include "utilities.h"
 #include "priorityQueue.h"
@@ -57,7 +58,7 @@ ListOfPaths * createEmpty (void) {
     empty -> next = NULL;
     return empty;
 }
-ListOfPaths * findAllEqualPaths (Map * map, int length, ListOfCities * city, ListOfCities * finalCity, City * previous) {
+ListOfPaths * findAllEqualPaths (Map * map, int length, ListOfCities * city, ListOfCities * finalCity, City * previous, dijkstra ** distanceTable) {
     if (length == 0 && city == finalCity) {
         return endOfPath(previous);
     } else if (length > 0) {
@@ -65,9 +66,10 @@ ListOfPaths * findAllEqualPaths (Map * map, int length, ListOfCities * city, Lis
         ListOfPaths * allPaths = createEmpty();
         while (neighbours) {
             unsigned distance = neighbours -> distance;
-            if (!previous || neighbours -> cityID != (previous -> oppositeWay) -> cityID) {
+            if (!previous || ((neighbours -> cityID != (previous -> oppositeWay) -> cityID) &&
+                (length - neighbours->distance == distanceTable[neighbours->cityID]->minDistance))) {
                 ListOfPaths *newElement = findAllEqualPaths(map, length - distance, neighbours -> mainListRep, finalCity,
-                                                            neighbours);
+                                                            neighbours, distanceTable);
                 allPaths = connectListOfPaths(newElement, allPaths);
             }
             neighbours = neighbours -> next;
@@ -111,15 +113,11 @@ int initializeVisitedTable (int tableLength, dijkstra ** visitedTable, ListOfCit
     visitedTable[origin -> cityID] -> visited = true;
     return true;
 }
-int shortestDistance (Map * map, ListOfCities * origin, ListOfCities * destination) {
-    int tableLength = amountOfCities(map);
-    dijkstra * visitedTable[tableLength];
-    if (initializeVisitedTable(tableLength, visitedTable, origin) == MEMORY_PROBLEM)
-        return false;
+void shortestDistance (Map * map, ListOfCities * origin, dijkstra ** visitedTable) {
     ListOfCities * isVisited = origin;
     priorityQueue * queue = newQueue();
 
-    while (isVisited && visitedTable[destination -> cityID] -> visited == 0) {
+    while (isVisited) {
         City * neighbours = isVisited -> neighbour;
         while (neighbours) {
             if (!(visitedTable[neighbours->cityID] -> visited)) {
@@ -137,10 +135,7 @@ int shortestDistance (Map * map, ListOfCities * origin, ListOfCities * destinati
         if (isVisited)
             visitedTable[isVisited -> cityID] -> visited = true;
     }
-    int toReturn = visitedTable[destination -> cityID] -> minDistance;
-    freeDijkstraTable(tableLength, visitedTable);
     removeQueue(queue);
-    return toReturn ;
 }
 
 Path * chooseBest(ListOfPaths * paths) {
@@ -168,16 +163,28 @@ Path * chooseBest(ListOfPaths * paths) {
     return best;
 }
 Path * bestPath (Map * map, ListOfCities * origin, ListOfCities * destination) {
-    int distance = shortestDistance(map, origin, destination);
+    int tableLength = amountOfCities(map);
+    dijkstra * distanceTable[tableLength];
+    if (initializeVisitedTable(tableLength, distanceTable, origin) == MEMORY_PROBLEM)
+        return NULL;
+    shortestDistance(map, origin, distanceTable);
+    int distance = distanceTable[destination->cityID] -> minDistance;
     if (distance == INT_MAX)
         return NULL;
-    City * previous = NULL;
-    ListOfPaths * paths = findAllEqualPaths(map, distance, origin, destination, previous);
+    ListOfPaths * paths = findAllEqualPaths(map, distance, destination, origin, NULL, distanceTable);
     if (!paths)
         return NULL;
     Path * new =  chooseBest(paths);
     freePaths(paths, new);
     return new;
+}
+
+City * lastCityOfPath (Path * path) {
+    if (!(path->next)) {
+        return path->city;
+    } else {
+        return lastCityOfPath(path->next);
+    }
 }
 
 bool idExists(Map * map, unsigned id) {
@@ -201,7 +208,7 @@ bool addIDToMap (unsigned id, Map * map, City * first) {
 }
 bool createRoute(unsigned routeID, Map * map, Path * path) {
     Map * copy = copyOfMap(map);
-    City * first = path -> city;
+    City * first = lastCityOfPath(path);
     Path * beggining = path;
     City * element = (path -> next) -> city;
     path = path -> next;

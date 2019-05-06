@@ -61,7 +61,13 @@ void removeFromMap(City * road) {
     removeElementFromMap(opp, destination);
 }
 bool deleteFromInsideOfRoute (Map * map, unsigned routeId, City * road) {
-    int distance = shortestDistanceForExtend(map, road -> mainListRep, (road -> oppositeWay) -> mainListRep, routeId);
+    int tableLength = amountOfCities(map);
+    dijkstra * distanceTable[tableLength];
+    if (initializeVisitedTable(tableLength, distanceTable, road -> mainListRep) == MEMORY_PROBLEM)
+        return false;
+    shortestDistanceForExtend(map, road -> mainListRep, (road -> oppositeWay) -> mainListRep, routeId, distanceTable);
+
+    int distance = distanceTable[(road->oppositeWay)->cityID] ->minDistance;
     if (distance == INT_MAX)
         return false;
     Path * best = bestPathForExtend(map, road -> mainListRep, (road -> oppositeWay) -> mainListRep, routeId);

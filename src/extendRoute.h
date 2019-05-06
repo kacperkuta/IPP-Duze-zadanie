@@ -84,7 +84,7 @@ ListOfPaths * findAllEqualPathsForExtend (Map * map, int length, ListOfCities * 
  * @p false w przypadku problemów z pamięcią.
  * Znalezioną najkrótszą odległość w przypadku powodzenia.
  */
-int shortestDistanceForExtend (Map * map, ListOfCities * origin, ListOfCities * destination, unsigned routeId);
+void shortestDistanceForExtend (Map * map, ListOfCities * origin, ListOfCities * destination, unsigned routeId, dijkstra ** visitedTable);
 /** @brief Znajduje najlepszą ścieżkę, którą można wykorzystać do rozszerzenia bądź uzupełnienia drogi krajowej.
  * @param map Wskaźnik na mapę.
  * @param origin Wskaźnik na miasto startowe.

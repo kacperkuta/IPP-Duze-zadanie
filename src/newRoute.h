@@ -57,7 +57,7 @@ ListOfPaths * createEmpty (void);
  * pusta lista ścieżek, generowana przez @ref createEmpty(), jeżeli nie udało się znależć żadnej ścieżki,
  * NULL w przypadku problemu z pamięcią.
  */
-ListOfPaths * findAllEqualPaths (Map * map, int length, ListOfCities * city, ListOfCities * finalCity, City * previous);
+ListOfPaths * findAllEqualPaths (Map * map, int length, ListOfCities * city, ListOfCities * finalCity, City * previous, dijkstra ** distanceTable);
 /** @brief Zlicza miasta w mapie.
  * @param map Wskaźnik na mapę, której miasta zliczamy.
  * @return Liczba miast w mapie.

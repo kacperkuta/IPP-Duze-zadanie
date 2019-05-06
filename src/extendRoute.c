@@ -2,6 +2,7 @@
 // Created by baka475 on 28.04.19.
 //
 #include <limits.h>
+#include <stdio.h>
 #include "extendRoute.h"
 #include "utilities.h"
 #include "freeMemory.h"
@@ -122,15 +123,11 @@ ListOfPaths * findAllEqualPathsForExtend (Map * map, int length, ListOfCities * 
         return createEmpty();
     }
 }
-int shortestDistanceForExtend (Map * map, ListOfCities * origin, ListOfCities * destination, unsigned routeId) {
-    int tableLength = amountOfCities(map);
-    dijkstra * visitedTable[tableLength];
-    if (initializeVisitedTable(tableLength, visitedTable, origin) == MEMORY_PROBLEM)
-        return false;
+void shortestDistanceForExtend (Map * map, ListOfCities * origin, ListOfCities * destination, unsigned routeId, dijkstra ** visitedTable) {
     ListOfCities * isVisited = origin;
     priorityQueue * queue = newQueue();
 
-    while (visitedTable[destination -> cityID] -> visited == 0 && isVisited) {
+    while (isVisited) {
         City *neighbours = isVisited->neighbour;
         while (neighbours) {
             if (typeOfRouteElement(map, routeId, neighbours -> mainListRep) == OUT_OF_ROUTE ||
@@ -152,12 +149,15 @@ int shortestDistanceForExtend (Map * map, ListOfCities * origin, ListOfCities * 
         }
     }
     removeQueue(queue);
-    int toReturn = visitedTable[destination -> cityID] -> minDistance;
-    freeDijkstraTable(tableLength, visitedTable);
-    return toReturn;
 }
 Path * bestPathForExtend (Map * map, ListOfCities * origin, ListOfCities * destination, unsigned routeId)  {
-    int distance = shortestDistanceForExtend(map, origin, destination, routeId);
+    int tableLength = amountOfCities(map);
+    dijkstra * distanceTable[tableLength];
+    if (initializeVisitedTable(tableLength, distanceTable, origin) == MEMORY_PROBLEM)
+        return false;
+    shortestDistanceForExtend(map, origin, destination, routeId, distanceTable);
+
+    int distance = distanceTable[destination->cityID]->minDistance;
     if (distance == INT_MAX)
         return NULL;
     City * previous = NULL;
@@ -201,8 +201,20 @@ bool caseEqualStartAndFinish (Map * map, int distanceFromStart, int distanceFrom
 }
 
 bool extendCorrectRoute (Map * map, ListOfCities * start, City * finish, ListOfCities * cityMainRep, unsigned routeId) {
-    int distanceFromFinish = shortestDistanceForExtend(map, finish -> mainListRep, cityMainRep, routeId);
-    int distanceFromStart = shortestDistanceForExtend(map, start, cityMainRep, routeId);
+    int tableLength = amountOfCities(map);
+    dijkstra * distanceTableFromFinish[tableLength];
+    if (initializeVisitedTable(tableLength, distanceTableFromFinish, finish->mainListRep) == MEMORY_PROBLEM)
+        return false;
+    dijkstra * distanceTableFromStart[tableLength];
+    if (initializeVisitedTable(tableLength, distanceTableFromStart, start) == MEMORY_PROBLEM)
+        return false;
+    shortestDistanceForExtend(map, finish -> mainListRep, cityMainRep, routeId, distanceTableFromFinish);
+    shortestDistanceForExtend(map, start, cityMainRep, routeId, distanceTableFromStart);
+
+    int distanceFromStart = distanceTableFromStart[finish->cityID]->minDistance;
+    int distanceFromFinish = distanceTableFromFinish[start->cityID]->minDistance;
+
+    printf("test %d s %d f\n", distanceFromStart, distanceFromFinish);
 
     if (distanceFromStart < distanceFromFinish) {
         return caseExtendFromStart(map, start, cityMainRep, routeId);
