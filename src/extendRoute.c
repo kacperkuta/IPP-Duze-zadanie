@@ -211,10 +211,8 @@ bool extendCorrectRoute (Map * map, ListOfCities * start, City * finish, ListOfC
     shortestDistanceForExtend(map, finish -> mainListRep, cityMainRep, routeId, distanceTableFromFinish);
     shortestDistanceForExtend(map, start, cityMainRep, routeId, distanceTableFromStart);
 
-    int distanceFromStart = distanceTableFromStart[finish->cityID]->minDistance;
-    int distanceFromFinish = distanceTableFromFinish[start->cityID]->minDistance;
-
-    printf("test %d s %d f\n", distanceFromStart, distanceFromFinish);
+    int distanceFromStart = distanceTableFromStart[cityMainRep->cityID]->minDistance;
+    int distanceFromFinish = distanceTableFromFinish[cityMainRep->cityID]->minDistance;
 
     if (distanceFromStart < distanceFromFinish) {
         return caseExtendFromStart(map, start, cityMainRep, routeId);
