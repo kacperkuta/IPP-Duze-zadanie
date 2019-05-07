@@ -113,7 +113,7 @@ int initializeVisitedTable (int tableLength, dijkstra ** visitedTable, ListOfCit
     visitedTable[origin -> cityID] -> visited = true;
     return true;
 }
-void shortestDistance (Map * map, ListOfCities * origin, dijkstra ** visitedTable) {
+void shortestDistance (ListOfCities * origin, dijkstra ** visitedTable) {
     ListOfCities * isVisited = origin;
     priorityQueue * queue = newQueue();
 
@@ -141,6 +141,7 @@ void shortestDistance (Map * map, ListOfCities * origin, dijkstra ** visitedTabl
 Path * chooseBest(ListOfPaths * paths) {
     if (paths -> path == NULL)
         return NULL;
+
     int year = INT_MIN;
     Path * best = paths -> path;
     Path * considered = best;
@@ -167,15 +168,20 @@ Path * bestPath (Map * map, ListOfCities * origin, ListOfCities * destination) {
     dijkstra * distanceTable[tableLength];
     if (initializeVisitedTable(tableLength, distanceTable, origin) == MEMORY_PROBLEM)
         return NULL;
-    shortestDistance(map, origin, distanceTable);
+    shortestDistance(origin, distanceTable);
     int distance = distanceTable[destination->cityID] -> minDistance;
-    if (distance == INT_MAX)
+    if (distance == INT_MAX) {
+        freeDijkstraTable(tableLength, distanceTable);
         return NULL;
+    }
     ListOfPaths * paths = findAllEqualPaths(map, distance, destination, origin, NULL, distanceTable);
-    if (!paths)
+    if (!paths) {
+        freeDijkstraTable(tableLength, distanceTable);
         return NULL;
+    }
     Path * new =  chooseBest(paths);
     freePaths(paths, new);
+    freeDijkstraTable(tableLength, distanceTable);
     return new;
 }
 

@@ -68,13 +68,16 @@ bool deleteFromInsideOfRoute (Map * map, unsigned routeId, City * road) {
     shortestDistanceForExtend(map, road -> mainListRep, (road -> oppositeWay) -> mainListRep, routeId, distanceTable);
 
     int distance = distanceTable[(road->oppositeWay)->cityID] ->minDistance;
-    if (distance == INT_MAX)
+    if (distance == INT_MAX) {
+        freeDijkstraTable(tableLength, distanceTable);
         return false;
+    }
     Path * best = bestPathForExtend(map, road -> mainListRep, (road -> oppositeWay) -> mainListRep, routeId);
     if (best) {
         road->routes = removeFromListOfIDs(road->routes, routeId);
         (road -> oppositeWay) -> routes = removeFromListOfIDs((road -> oppositeWay) -> routes, routeId);
     }
+    freeDijkstraTable(tableLength, distanceTable);
     return continuePath(best, routeId);
 }
 bool removeTailOfRoute (Map * map, City * road, unsigned routeId) {

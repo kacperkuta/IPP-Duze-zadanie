@@ -93,7 +93,7 @@ City * finalElementOfPath (Path * path) {
     return NULL;
 }
 
-ListOfPaths * findAllEqualPathsForExtend (Map * map, int length, ListOfCities * city, ListOfCities * finalCity, City * previous, unsigned routeId) {
+ListOfPaths * findAllEqualPathsForExtend (Map * map, int length, ListOfCities * city, ListOfCities * finalCity, City * previous, unsigned routeId, dijkstra ** distanceTable) {
     if (length == 0 && city == finalCity) {
         return endOfPath(previous);
     } else if (length > 0) {
@@ -104,10 +104,11 @@ ListOfPaths * findAllEqualPathsForExtend (Map * map, int length, ListOfCities * 
                           (!previous || (previous -> oppositeWay) -> cityID != neighbours -> cityID);
             bool case2 = neighbours -> cityID == finalCity -> cityID && !isInRoute(neighbours, routeId) && !(isInRoute(neighbours->oppositeWay, routeId));
 
-            if (case1 || case2) {
+            bool stepCondition = (length - neighbours->distance == distanceTable[neighbours->cityID]->minDistance);
+            if (stepCondition && (case1 || case2)) {
                 unsigned distance = neighbours->distance;
                 ListOfPaths *newElement = findAllEqualPathsForExtend(map, length - distance, neighbours->mainListRep, finalCity,
-                                                                     neighbours, routeId);
+                                                                     neighbours, routeId, distanceTable);
                 allPaths = connectListOfPaths(newElement, allPaths);
             }
             neighbours = neighbours -> next;
@@ -158,14 +159,16 @@ Path * bestPathForExtend (Map * map, ListOfCities * origin, ListOfCities * desti
     shortestDistanceForExtend(map, origin, destination, routeId, distanceTable);
 
     int distance = distanceTable[destination->cityID]->minDistance;
-    if (distance == INT_MAX)
+    if (distance == INT_MAX) {
+        freeDijkstraTable(tableLength, distanceTable);
         return NULL;
-    City * previous = NULL;
-    ListOfPaths * paths = findAllEqualPathsForExtend(map, distance, origin, destination, previous, routeId);
+    }
+    ListOfPaths * paths = findAllEqualPathsForExtend(map, distance, destination, origin, NULL, routeId, distanceTable);
     if (!paths)
         return NULL;
     Path * new =  chooseBest(paths);
     freePaths(paths, new);
+    freeDijkstraTable(tableLength, distanceTable);
     return new;
 }
 
@@ -178,14 +181,17 @@ bool caseExtendFromStart (Map * map, ListOfCities * start, ListOfCities * finish
 }
 bool caseExtendFromFinish (Map * map, ListOfCities * finish, ListOfCities * newEnd, unsigned routeId) {
     Path * best = bestPathForExtend(map, finish, newEnd, routeId);
+    if (!best)
+        return false;
     if (!continuePath(best, routeId))
         return false;
     return true;
 }
-bool caseEqualStartAndFinish (Map * map, int distanceFromStart, int distanceFromFinish, ListOfCities * start, City * finish, ListOfCities * city,
-                              unsigned routeId) {
-    ListOfPaths * fromStart = findAllEqualPathsForExtend(map, distanceFromStart, city, start, NULL, routeId);
-    ListOfPaths * fromFinish = findAllEqualPathsForExtend(map, distanceFromFinish, finish -> mainListRep, city, NULL, routeId);
+bool caseEqualStartAndFinish (Map * map, int distanceFromStart, ListOfCities * start, City * finish, ListOfCities * city,
+                              unsigned routeId, dijkstra ** distanceTableFromStart, dijkstra ** distanceTableFromFinish) {
+    ListOfPaths * fromStart = findAllEqualPathsForExtend(map, distanceFromStart, city, start, NULL, routeId, distanceTableFromStart);
+    ListOfPaths * fromFinish = findAllEqualPathsForExtend(map, distanceFromStart, city, finish->mainListRep, NULL, routeId, distanceTableFromFinish);
+
     if (!(fromFinish && fromStart))
         return false;
     fromStart = connectListOfPaths(fromStart, fromFinish);
@@ -214,15 +220,20 @@ bool extendCorrectRoute (Map * map, ListOfCities * start, City * finish, ListOfC
     int distanceFromStart = distanceTableFromStart[cityMainRep->cityID]->minDistance;
     int distanceFromFinish = distanceTableFromFinish[cityMainRep->cityID]->minDistance;
 
+    bool test;
+
     if (distanceFromStart < distanceFromFinish) {
-        return caseExtendFromStart(map, start, cityMainRep, routeId);
+        test = caseExtendFromStart(map, start, cityMainRep, routeId);
     } else if (distanceFromStart > distanceFromFinish) {
-        return caseExtendFromFinish(map, finish -> mainListRep, cityMainRep, routeId);
+        test = caseExtendFromFinish(map, finish -> mainListRep, cityMainRep, routeId);
     } else if (distanceFromFinish != INT_MAX) {
-        return caseEqualStartAndFinish(map, distanceFromStart, distanceFromFinish, start, finish, cityMainRep,routeId);
+        test = caseEqualStartAndFinish(map, distanceFromStart, start, finish, cityMainRep, routeId, distanceTableFromStart, distanceTableFromFinish);
     } else {
-        return false;
+        test = false;
     }
+    freeDijkstraTable(tableLength, distanceTableFromFinish);
+    freeDijkstraTable(tableLength, distanceTableFromStart);
+    return test;
 }
 
 

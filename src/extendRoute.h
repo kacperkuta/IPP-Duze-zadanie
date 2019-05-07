@@ -73,7 +73,7 @@ City * finalElementOfPath (Path * path);
  * pusta lista ścieżek, generowana przez @ref createEmpty(), jeżeli nie udało się znależć żadnej ścieżki,
  * NULL w przypadku problemu z pamięcią.
 */
-ListOfPaths * findAllEqualPathsForExtend (Map * map, int length, ListOfCities * city, ListOfCities * finalCity, City * previous, unsigned routeId);
+ListOfPaths * findAllEqualPathsForExtend (Map * map, int length, ListOfCities * city, ListOfCities * finalCity, City * previous, unsigned routeId, dijkstra ** visitedTable);
 /** @brief Algorytm dijkstry znajdujący najkrótszą ścieżkę między miastami.
  * Znajduje najkrótszą ścieżkę między city a finalCity, która może być użyta do wydłużenia drogi krajowej bądź jej uzupełnienia.
  * @param map Wskaźnik na mapę.
