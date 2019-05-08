@@ -31,6 +31,8 @@ int checkYear(Path * path) {
     return year;
 }
 City * getRoad(Map * map, int originCityID, int targetCityID) {
+    if (originCityID == -1 || targetCityID == -1)
+        return false;
     ListOfCities * start = findCity(map, originCityID);
     City * neighbour = start -> neighbour;
     if (!neighbour)

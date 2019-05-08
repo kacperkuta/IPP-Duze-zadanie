@@ -36,7 +36,6 @@ typedef struct element {
 City * findRoad (Map * map, const char * city1, const char * city2) {
     int id1 = searchForCityID(city1, map ->  citiesID, map -> citiesIDLength);
     int id2 = searchForCityID(city2, map ->  citiesID, map -> citiesIDLength);
-
     return getRoad(map, id1, id2);
 }
 
@@ -48,13 +47,18 @@ element * readElement () {
     if (!checkSemicolon())
         return NULL;
     const char * distanceString = readToSemicolon();
-
-    if (!checkSemicolon() || !isNumber(distanceString)) {
+    if (!checkSemicolon()) {
         freeIfNotNULL(distanceString);
         return NULL;
     }
     const char * buildYearString = readToSemicolon();
-    if (!checkSemicolon() || !isNumber(buildYearString)) {
+    if (!checkSemicolon()) {
+        freeIfNotNULL(distanceString);
+        freeIfNotNULL(buildYearString);
+        return NULL;
+    }
+    if (!isNumber(distanceString) || !isNumber(buildYearString)) {
+        checkEOL();
         freeIfNotNULL(distanceString);
         freeIfNotNULL(buildYearString);
         return NULL;
@@ -62,10 +66,13 @@ element * readElement () {
     const char * city = readToSemicolon();
     int distance = convertStringToInteger(distanceString);
     int buildYear = convertStringToInteger(buildYearString);
+
     if (distance <= 0) {
+        checkEOL();
         freeIfNotNULL(city);
         freeIfNotNULL(distanceString);
         freeIfNotNULL(buildYearString);
+        return NULL;
     }
     element * new = malloc(sizeof(element));
     if (!new)
@@ -79,7 +86,9 @@ element * readElement () {
 void freeMemoryOfRoute (Route * r) {
     while (r) {
         freeMemoryOfRoute(r->next);
-        free(r->road);
+        if (r->road) {
+            free((void *)(r->road));
+        }
         free(r);
     }
 }
@@ -96,6 +105,7 @@ Route * readRouteToCreate () {
     start -> city = readToSemicolon();
     first -> road = start;
     first -> next = NULL;
+
     if (!checkSemicolon()) {
         freeMemoryOfRoute(first);
         return NULL;
@@ -103,16 +113,20 @@ Route * readRouteToCreate () {
 
     int sign = ';';
     while (sign != '\n') {
+
         ungetc(sign, stdin);
         element * el = readElement();
-        route -> next = malloc(sizeof(route));
+        if (!el) {
+            //freeMemoryOfRoute(first);
+            return NULL;
+        }
 
-        if (!el || !(route->next)) {
-            if (el)
-                free(el);
+        route -> next = malloc(sizeof(route));
+        if (!(route -> next)) {
             freeMemoryOfRoute(first);
             return NULL;
         }
+
         route = route -> next;
         route -> road = el;
         route -> next = NULL;
@@ -125,10 +139,14 @@ bool checkIfRoadCorrect (Map * map, Route * previous, Route * next) {
     City * road = findRoad(map, (previous->road->city), (next->road->city));
     if (!road)
         return true;
-    return  !((road->distance != (next->road->distance)) || (road->buildYear) > (next->road->buildYear) || (next->road->buildYear) == 0);
+    if (road->distance != (next->road->distance))
+        return false;
+    return  !((road->buildYear) > (next->road->buildYear) || (next->road->buildYear) == 0);
 }
 
 bool checkIfRoutePossible (Map * map, Route * r) {
+    if (!r)
+        return false;
     bool test = true;
     while (test && r && r -> next) {
         test = checkIfRoadCorrect(map, r, r->next);

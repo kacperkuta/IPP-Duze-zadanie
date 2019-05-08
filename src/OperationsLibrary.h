@@ -40,21 +40,29 @@ bool addRoadCall (Map * map) {
     }
 
     const char * builtYear = readToSemicolon();
-    if (!checkEOL() || !isNumber(length) || !isNumber(builtYear) ||
-        !strcmp("", city1) || !strcmp("", city2)) {
+    if (!checkEOL()) {
         freeIfNotNULL(city1);
         freeIfNotNULL(city2);
         freeIfNotNULL(length);
         freeIfNotNULL(builtYear);
         return false;
     }
+    if (!isNumber(length) || !isNumber(builtYear) ||
+        !strcmp("", city1) || !strcmp("", city2)) {
+        freeIfNotNULL(city1);
+        freeIfNotNULL(city2);
+        freeIfNotNULL(length);
+        freeIfNotNULL(builtYear);
+        checkEOL();
+        return false;
+    }
 
     bool success = true;
     int length1 = convertStringToInteger(length);
-    if (length1 < 0)
+    if (length1 <= 0)
         success = false;
     int builtYear1 = convertStringToInteger(builtYear);
-    if (length1 >= 0)
+    if (length1 > 0)
         success = addRoad(map, city1, city2, (unsigned)length1, builtYear1);
     freeIfNotNULL(city1);
     freeIfNotNULL(city2);
@@ -83,8 +91,14 @@ bool repairRoadCall (Map * map) {
 
     const char * repairYear = readToSemicolon();
 
-    if (!checkEOL() || !isNumber(repairYear) ||
-        !strcmp("", city1) || !strcmp("", city2)) {
+    if (!checkEOL()) {
+        freeIfNotNULL(city1);
+        freeIfNotNULL(city2);
+        freeIfNotNULL(repairYear);
+        return false;
+    }
+    if (!isNumber(repairYear) || !strcmp("", city1) || !strcmp("", city2)) {
+        checkEOL();
         freeIfNotNULL(city1);
         freeIfNotNULL(city2);
         freeIfNotNULL(repairYear);
@@ -99,13 +113,16 @@ bool getRouteDescriptionCall (Map * map) {
     if (!checkSemicolon()) {
         return false;
     }
-
     const char *id = readToSemicolon();
-    if (!checkEOL() || !isNumber(id)) {
+    if (!checkEOL()) {
         freeIfNotNULL(id);
         return false;
     }
-
+    if (!isNumber(id)) {
+        checkEOL();
+        freeIfNotNULL(id);
+        return false;
+    }
     int routeId = convertStringToInteger(id);
     if (routeId < 0) {
         freeIfNotNULL(id);

@@ -57,7 +57,7 @@ bool isNumber (const char * inscription) {
     if (strlen(inscription) == 0)
         return false;
     bool test = true;
-    for (unsigned long i = 0; i < strlen(inscription) && test; i++) {
+    for (unsigned long i = (unsigned)(inscription[0] == '-'); i < strlen(inscription) && test; i++) {
         if ((i > 0 && !(inscription[i] >= '0' && inscription[i] <= '9' )) || (i == 0 && inscription[i] == '-'))
             test = false;
     }
