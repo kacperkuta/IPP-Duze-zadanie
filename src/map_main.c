@@ -9,9 +9,9 @@
 
 int main() {
 
-  Map* m = newMap();
+  Map* map = newMap();
 
-  realizeAllLines(m);
+  realizeAllLines(map);
 
   return 0;
 
