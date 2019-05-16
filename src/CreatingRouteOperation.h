@@ -11,6 +11,7 @@
 #include "utilities.h"
 #include "ReadLibrary.h"
 #include "newRoute.h"
+#include "copyOfMap.h"
 
 #define UPDATE_YEAR 100
 #define ADD_ROAD 101
@@ -80,56 +81,70 @@ element * readElement () {
     new -> city = city;
     new -> distance = (unsigned)distance;
     new -> buildYear = buildYear;
+    freeIfNotNULL(distanceString);
+    freeIfNotNULL(buildYearString);
     return new;
 }
 
 void freeMemoryOfRoute (Route * r) {
-    while (r) {
+    if (r) {
         freeMemoryOfRoute(r->next);
         if (r->road) {
+            free((void*)((r->road)->city));
             free((void *)(r->road));
         }
         free(r);
     }
 }
 
-/** @brief Wczytuje nową drogę krajową.
- * @return NULL jeśli błąd pamięci lub polecenie niepoprawne. Wskaźnik wpp.
- */
-Route * readRouteToCreate () {
+Route * firstElementCreating () {
     Route * first = malloc(sizeof(Route));
-    Route * route = first;
     if (!first || !checkSemicolon())
         return NULL;
     element * start = malloc(sizeof(element));
+    if (!start) {
+        free(first);
+        return NULL;
+    }
     start -> city = readToSemicolon();
+    if (!(start->city)) {
+        free(first);
+        checkEOL();
+        return NULL;
+    }
     first -> road = start;
     first -> next = NULL;
-
     if (!checkSemicolon()) {
         freeMemoryOfRoute(first);
         return NULL;
     }
+    return first;
+}
+
+/** @brief Wczytuje nową drogę krajową.
+ * @return NULL jeśli błąd pamięci lub polecenie niepoprawne. Wskaźnik wpp.
+ */
+Route * readRouteToCreate () {
+    Route * first = firstElementCreating();
+    Route * route = first;
 
     int sign = ';';
     while (sign != '\n') {
-
         ungetc(sign, stdin);
         element * el = readElement();
         if (!el) {
-            //freeMemoryOfRoute(first);
+            freeMemoryOfRoute(first);
             return NULL;
         }
-
-        route -> next = malloc(sizeof(route));
+        route -> next = malloc(sizeof(Route));
         if (!(route -> next)) {
             freeMemoryOfRoute(first);
             return NULL;
         }
-
         route = route -> next;
         route -> road = el;
         route -> next = NULL;
+
         sign = getchar();
     }
     return first;
@@ -186,6 +201,7 @@ bool takeActions (Map * map, Route * previous, Route * next, int routeId) {
 }
 
 bool routeCreation (Map * map, int routeId) {
+    Map * mapCopy = copyOfMap(map);
     if (routeId >= 1000)
         return false;
     Route * r = readRouteToCreate();
@@ -194,13 +210,19 @@ bool routeCreation (Map * map, int routeId) {
         while (r && r->next) {
             bool test = takeActions(map, r, r->next, routeId);
             if (!test){
-                //na razie nic nie robimy, tu bedzie przywracanie mapy
+               freeMemoryOfRoute(copy);
+               repairMap(map, mapCopy);
+               return false;
             }
             r = r->next;
         }
         bool test2 = addIDToMap((unsigned)routeId, map, findRoad(map, (copy->next)->road->city, copy->road->city));
+        deleteMap(mapCopy);
+        freeMemoryOfRoute(copy);
         return test2;
     }
+    deleteMap(mapCopy);
+    freeMemoryOfRoute(copy);
     return false;
 }
 

@@ -108,7 +108,6 @@ int commandType (const char * inscription) {
         return DESCRIPTION;
     else
         return INCORRECT_COMMAND;
-
 }
 
 bool checkEOL () {

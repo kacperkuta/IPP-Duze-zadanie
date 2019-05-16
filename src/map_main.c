@@ -13,6 +13,8 @@ int main() {
 
   realizeAllLines(map);
 
+  deleteMap(map);
+
   return 0;
 
 }

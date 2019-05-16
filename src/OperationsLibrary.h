@@ -157,6 +157,7 @@ void realizeLine (Map * map, int lineNumber) {
         if (!routeCreation(map, (unsigned)type))
             fprintf(stderr, "ERROR %d\n", lineNumber);
     }
+    freeIfNotNULL(instr);
 }
 
 void realizeAllLines (Map * map) {
