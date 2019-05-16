@@ -23,7 +23,7 @@ set(CMAKE_C_FLAGS "-std=c11 -Wall -Wextra")
 set(SOURCE_FILES
     src/map.c
     src/map.h
-    src/map_main.c src/structures.h src/AddRepair.h src/AddRepair.c src/utilities.c src/newRoute.c src/priorityQueue.h src/priorityQueue.c src/freeMemory.h src/freeMemory.c src/copyOfMap.h src/copyOfMap.c src/getRouteDescription.c src/getRouteDescription.h src/extendRoute.c src/removeRoad.c src/extendRoute.h src/utilities.h src/removeRoad.h src/getRouteDescription.h src/newRoute.h src/ReadLibrary.h src/OperationsLibrary.h src/CreatingRouteOperation.h)
+    src/map_main.c src/structures.h src/AddRepair.h src/AddRepair.c src/utilities.c src/newRoute.c src/priorityQueue.h src/priorityQueue.c src/freeMemory.h src/freeMemory.c src/copyOfMap.h src/copyOfMap.c src/getRouteDescription.c src/getRouteDescription.h src/extendRoute.c src/removeRoad.c src/extendRoute.h src/utilities.h src/removeRoad.h src/getRouteDescription.h src/newRoute.h src/ReadLibrary.h src/OperationsLibrary.h src/CreatingRouteOperation.h src/CreatingRouteOperation.c src/ReadLibrary.c src/OperationsLibrary.c)
 
 # Wskazujemy plik wykonywalny.
 add_executable(map ${SOURCE_FILES})

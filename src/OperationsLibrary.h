@@ -7,171 +7,47 @@
 #include <stdio.h>
 #include <string.h>
 #include "map.h"
-#include "ReadLibrary.h"
 #include "CreatingRouteOperation.h"
 
 #ifndef DROGI_OPERATIONSLIBRARY_H
 #define DROGI_OPERATIONSLIBRARY_H
 
-bool addRoadCall (Map * map) {
-    if (!checkSemicolon()) {
-        return false;
-    }
+/** @brief Funkcja wywoływana w przypadku, gdy pierwsze polecenie w linii przed średnikiem to addRoad.
+ * Sprawdza poprawność danych wejściowych. Jeżeli gdzieś wystąpi błąd wczytuje aż do napotkania znaku końca linii lub końca pliku.
+ * Jeżeli wszystkie dane są poprawne podejmuje próbę wywołania polecenia addRoad.
+ * @param map
+ * @return @p false jeżeli dane wejściowe są niepoprawne lub wystąpi problem z alokacją pamięci. Wynik działania funkcji @ref addRoad wpp.
+ */
+bool addRoadCall (Map * map);
 
-    const char * city1 = readToSemicolon();
-    if (!checkSemicolon()) {
-        freeIfNotNULL(city1);
-        return false;
-    }
+/** @brief Funkcja wywoływana w przypadku, gdy pierwsze polecenie w linii przed średnikiem to repairRoad.
+ * Sprawdza poprawność danych wejściowych. Jeżeli gdzieś wystąpi błąd wczytuje aż do napotkania znaku końca linii lub końca pliku.
+ * Jeżeli wszystkie dane są poprawne podejmuje próbę wywołania polecenia repairRoad.
+ * @param map
+ * @return @p false jeżeli dane wejściowe są niepoprawne lub wystąpi problem z alokacją pamięci. Wynik działania funkcji @ref repairRoad wpp.
+*/
+ bool repairRoadCall (Map * map);
 
-    const char * city2 = readToSemicolon();
-    if (!checkSemicolon()) {
-        freeIfNotNULL(city1);
-        freeIfNotNULL(city2);
-        return false;
-    }
+/** @brief Funkcja wywoływana w przypadku, gdy pierwsze polecenie w linii przed średnikiem to getRouteDescription.
+ * Sprawdza poprawność danych wejściowych. Jeżeli gdzieś wystąpi błąd wczytuje aż do napotkania znaku końca linii lub końca pliku.
+ * Jeżeli wszystkie dane są poprawne podejmuje próbę wywołania polecenia getRouteDescription.
+ * @param map
+ * @return @p false jeżeli dane wejściowe są niepoprawne lub wystąpi problem z alokacją pamięci. Wynik działania funkcji @ref getRouteDescription wpp.
+*/
+bool getRouteDescriptionCall (Map * map);
 
-    const char * length = readToSemicolon();
-    if (!checkSemicolon()) {
-        freeIfNotNULL(city1);
-        freeIfNotNULL(city2);
-        freeIfNotNULL(length);
-        return false;
-    }
+/** @brief Realizuje jedną linię wejścia.
+ * Analizuje polecenie i wywołuje odpowiednią funkcję. W przypadku błędu, niepoprawnego polecenia, braku wolnej pamięci, wypisuje ERROR i numer linii
+ * na standardowe wyjście diagnostyczne.
+ * @param map Wskaźnik na mapę.
+ * @param lineNumber Numer linii wejścia.
+ */
+void realizeLine (Map * map, int lineNumber);
 
-    const char * builtYear = readToSemicolon();
-    if (!checkEOL()) {
-        freeIfNotNULL(city1);
-        freeIfNotNULL(city2);
-        freeIfNotNULL(length);
-        freeIfNotNULL(builtYear);
-        return false;
-    }
-    if (!isNumber(length) || !isNumber(builtYear) ||
-        !strcmp("", city1) || !strcmp("", city2)) {
-        freeIfNotNULL(city1);
-        freeIfNotNULL(city2);
-        freeIfNotNULL(length);
-        freeIfNotNULL(builtYear);
-        checkEOL();
-        return false;
-    }
-
-    bool success = true;
-    int length1 = convertStringToInteger(length);
-    if (length1 <= 0)
-        success = false;
-    int builtYear1 = convertStringToInteger(builtYear);
-    if (length1 > 0)
-        success = addRoad(map, city1, city2, (unsigned)length1, builtYear1);
-    freeIfNotNULL(city1);
-    freeIfNotNULL(city2);
-    freeIfNotNULL(length);
-    freeIfNotNULL(builtYear);
-    return success;
-}
-
-bool repairRoadCall (Map * map) {
-    if (!checkSemicolon()) {
-        return false;
-    }
-
-    const char * city1 = readToSemicolon();
-    if (!checkSemicolon()) {
-        freeIfNotNULL(city1);
-        return false;
-    }
-
-    const char * city2 = readToSemicolon();
-    if (!checkSemicolon()) {
-        freeIfNotNULL(city1);
-        freeIfNotNULL(city2);
-        return false;
-    }
-
-    const char * repairYear = readToSemicolon();
-
-    if (!checkEOL()) {
-        freeIfNotNULL(city1);
-        freeIfNotNULL(city2);
-        freeIfNotNULL(repairYear);
-        return false;
-    }
-    if (!isNumber(repairYear) || !strcmp("", city1) || !strcmp("", city2)) {
-        checkEOL();
-        freeIfNotNULL(city1);
-        freeIfNotNULL(city2);
-        freeIfNotNULL(repairYear);
-        return false;
-    }
-
-    int repairYear1 = convertStringToInteger(repairYear);
-    return repairRoad(map, city1, city2, repairYear1);
-}
-
-bool getRouteDescriptionCall (Map * map) {
-    if (!checkSemicolon()) {
-        return false;
-    }
-    const char *id = readToSemicolon();
-    if (!checkEOL()) {
-        freeIfNotNULL(id);
-        return false;
-    }
-    if (!isNumber(id)) {
-        checkEOL();
-        freeIfNotNULL(id);
-        return false;
-    }
-    int routeId = convertStringToInteger(id);
-    if (routeId < 0) {
-        freeIfNotNULL(id);
-        return false;
-    }
-    const char * description = getRouteDescription(map, (unsigned)routeId);
-    if (description) {
-        printf("%s\n", description);
-    }
-    freeIfNotNULL(description);
-    freeIfNotNULL(id);
-    return description != NULL;
-}
-
-void realizeLine (Map * map, int lineNumber) {
-    const char * instr = readToSemicolon();
-    int type = commandType(instr);
-    if (type == INCORRECT_COMMAND) {
-        checkEOL();
-        freeIfNotNULL(instr);
-        fprintf(stderr, "ERROR %d\n", lineNumber);
-    } else if (type == ADD) {
-        if (!addRoadCall(map))
-            fprintf(stderr, "ERROR %d\n", lineNumber);
-    } else if (type == REPAIR) {
-        if (!repairRoadCall(map))
-            fprintf(stderr, "ERROR %d\n", lineNumber);
-    } else if (type == DESCRIPTION) {
-        if (!getRouteDescriptionCall(map))
-            fprintf(stderr, "ERROR %d\n", lineNumber);
-    } else {
-        if (!routeCreation(map, (unsigned)type))
-            fprintf(stderr, "ERROR %d\n", lineNumber);
-    }
-    freeIfNotNULL(instr);
-}
-
-void realizeAllLines (Map * map) {
-    int sign = getchar();
-    int i = 1;
-    while (sign != EOF) {
-        ungetc(sign, stdin);
-        if (sign == '#' || sign == '\n')
-            checkEOL();
-        else
-            realizeLine(map, i);
-        i++;
-        sign = getchar();
-    }
-}
+/** @brief Wywołuje funkcję @ref realizeLine dla wszystkich linii pliku aż do napotkania znaku końca pliku.
+ * Ignoruje linie zaczynające się od znaku '#' oraz puste linie.
+ * @param map Wskaźnik na mapę.
+ */
+void realizeAllLines (Map * map);
 
 #endif //DROGI_OPERATIONSLIBRARY_H
