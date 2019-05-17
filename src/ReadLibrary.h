@@ -1,6 +1,8 @@
-//
-// Created by baka475 on 07.05.19.
-//
+/** @file
+ * Interfejs klasy funkcji używanych do wczytywania poleceń z pliku wejściowego.
+ * @author Kacper Kuta <k.kuta2@student.uw.edu.pl>
+ * @date 8.05.2019
+ */
 
 #ifndef DROGI_READLIBRARY_H
 #define DROGI_READLIBRARY_H
@@ -10,9 +12,13 @@
 #include <string.h>
 #include "map.h"
 
+/** @brief Stała oznaczająca polecenie dodawania nowego odcinka, równa -10 */
 #define ADD -10
+/** @brief Stała oznaczająca polecenie naprawienia odcinka drogowego, równa -11 */
 #define REPAIR -11
+/** @brief Stała oznaczająca polecenie wywołania funkcji getRouteDecription równa -12 */
 #define DESCRIPTION -12
+/** @brief Stała oznaczająca nieporawidłowe polecenie równa -13 */
 #define INCORRECT_COMMAND -13
 
 /** @brief Funkcja zarządzająca pamięcią.

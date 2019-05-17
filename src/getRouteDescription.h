@@ -6,6 +6,7 @@
 #ifndef DROGI_GETROUTEDESCRIPTION_H
 #define DROGI_GETROUTEDESCRIPTION_H
 
+/** @brief Początkowy rozmiar tablicy, wystarczający dla większości sensownych nazw */
 #define START_SIZE 32
 #include "structures.h"
 #include "map.h"

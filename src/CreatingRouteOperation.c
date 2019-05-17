@@ -8,24 +8,32 @@
 #define ADD_ROAD 101
 #define NONE 102
 
-/** @brief Wyszukuje odcinek dorogwy między miastem city1 i city2.
- * @param map Mapa w której szukamy
- * @param city1 Nazwa pierwszego miasta
- * @param city2 Nazwa drugiego miasta
- * @return Wskaźnik w przypadku odnalezienia. NULL wpp.
+/** @brief Struktura nowej drogi krajowej
  */
+typedef struct Route {
+    /** @brief Odcinek drogowy */
+    struct element * road;
+    /** @brief Wskaźnik na następny element drogi krajowej */
+    struct Route * next;
+} Route;
+
+/** @brief Struktura elementu nowej drogi krajowej
+ */
+typedef struct element {
+    /** @brief Wskaźnik na nazwę miasta */
+    const char * city;
+    /** @brief Długość odcinka drogowego */
+    unsigned distance;
+    /** @brief Rok budowy */
+    int buildYear;
+} element;
+
 City * findRoad (Map * map, const char * city1, const char * city2) {
     int id1 = searchForCityID(city1, map ->  citiesID, map -> citiesIDLength);
     int id2 = searchForCityID(city2, map ->  citiesID, map -> citiesIDLength);
-    //printf("%s %s", city1, city2);
-    //printf("\n%d %d\n", id1, id2);
     return getRoad(map, id1, id2);
 }
 
-/** @brief Czyta element nowej drogi krajowej.
- * W przypadku błędnej reprezentacji odcinka wczytuje linię do końca.
- * @return NULL w przypadku błędu alokacji pamięci, lub niepoprawnego przedstawienia odcinka. Wskaźnik wpp.
- */
 element * readElement () {
     if (!checkSemicolon())
         return NULL;
@@ -110,9 +118,6 @@ Route * firstElementCreating () {
     return first;
 }
 
-/** @brief Wczytuje nową drogę krajową.
- * @return NULL jeśli błąd pamięci lub polecenie niepoprawne. Wskaźnik wpp.
- */
 Route * readRouteToCreate () {
     Route * first = firstElementCreating();
     if (!first)

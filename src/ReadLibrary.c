@@ -3,6 +3,7 @@
 //
 #include "ReadLibrary.h"
 
+
 bool extendMemory (char ** description, int * length, int expectedLength) {
     if (*length < expectedLength) {
         (*length) = expectedLength * 2;

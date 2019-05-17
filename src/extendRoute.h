@@ -67,6 +67,7 @@ City * finalElementOfPath (Path * path);
  * @param city Wskaźnik na miasto startowe.
  * @param finalCity Wskaźnik na miasto docelowe.
  * @param previous Wskaźnik na odcinek drogowy, którym przyszliśmy do miasta startowego.
+ * @param visitedTable Tablica struktur @ref dijkstra, przechowująca odległości od wierzchołka.
  * NULL, jeżeli jesteśmy w pierwszym mieście.
  * @param routeId Numer rozszerzanej bądź usuwanej drogi krajowej.
  * @return Lista ścieżek, jeżeli uda się jakąkolwiek znaleźć,
@@ -80,6 +81,7 @@ ListOfPaths * findAllEqualPathsForExtend (Map * map, int length, ListOfCities * 
  * @param origin Wskaźnik na miasto, z którego startuejmy.
  * @param destination Wskaźnik na miasto, do którego zmierzamy.
  * @param routeId Numer drogi krajowej, którą naprawiamy bądź wydłużamy.
+ * @param visitedTable Tablica struktur @ref dijkstra, przechowująca odległości od wierzchołka.
  * @return @p INT_MAX jeżeli nie istnieje taka ścieżka.
  * @p false w przypadku problemów z pamięcią.
  * Znalezioną najkrótszą odległość w przypadku powodzenia.

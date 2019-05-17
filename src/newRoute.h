@@ -53,6 +53,7 @@ ListOfPaths * createEmpty (void);
  * @param finalCity Wskaźnik na miasto docelowe.
  * @param previous Wskaźnik na odcinek drogowy, którym przyszliśmy do miasta startowego.
  * NULL, jeżeli jesteśmy w pierwszym mieście.
+ * @param distanceTable Tablica struktur @ref dijkstra odległości do finlanego wierzchołka.
  * @return Lista ścieżek, jeżeli uda się jakąkolwiek znaleźć,
  * pusta lista ścieżek, generowana przez @ref createEmpty(), jeżeli nie udało się znależć żadnej ścieżki,
  * NULL w przypadku problemu z pamięcią.

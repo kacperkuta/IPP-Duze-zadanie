@@ -1,6 +1,8 @@
-//
-// Created by baka475 on 08.05.19.
-//
+/** @file
+ * Interfejs klasy funkcji używanych do obsługi poleceń addRoad, repairRoad i getRouteDescription.
+ * @author Kacper Kuta <k.kuta2@student.uw.edu.pl>
+ * @date 8.05.2019
+ */
 
 #include <stdbool.h>
 #include <stdlib.h>
