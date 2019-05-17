@@ -28,9 +28,8 @@ bool addRoadCall (Map * map) {
         freeIfNotNULL(length);
         return false;
     }
-
     const char * builtYear = readToSemicolon();
-    if (!checkEOL()) {
+    if (!checkEOL() || !builtYear) {
         freeIfNotNULL(city1);
         freeIfNotNULL(city2);
         freeIfNotNULL(length);
@@ -43,7 +42,6 @@ bool addRoadCall (Map * map) {
         freeIfNotNULL(city2);
         freeIfNotNULL(length);
         freeIfNotNULL(builtYear);
-        checkEOL();
         return false;
     }
 
@@ -81,14 +79,13 @@ bool repairRoadCall (Map * map) {
 
     const char * repairYear = readToSemicolon();
 
-    if (!checkEOL()) {
+    if (!checkEOL() || !repairYear) {
         freeIfNotNULL(city1);
         freeIfNotNULL(city2);
         freeIfNotNULL(repairYear);
         return false;
     }
     if (!isNumber(repairYear) || !strcmp("", city1) || !strcmp("", city2)) {
-        checkEOL();
         freeIfNotNULL(city1);
         freeIfNotNULL(city2);
         freeIfNotNULL(repairYear);
@@ -96,7 +93,11 @@ bool repairRoadCall (Map * map) {
     }
 
     int repairYear1 = convertStringToInteger(repairYear);
-    return repairRoad(map, city1, city2, repairYear1);
+    freeIfNotNULL(repairYear);
+    bool test =  repairRoad(map, city1, city2, repairYear1);
+    freeIfNotNULL(city1);
+    freeIfNotNULL(city2);
+    return test;
 }
 
 bool getRouteDescriptionCall (Map * map) {
@@ -109,7 +110,6 @@ bool getRouteDescriptionCall (Map * map) {
         return false;
     }
     if (!isNumber(id)) {
-        checkEOL();
         freeIfNotNULL(id);
         return false;
     }
@@ -119,12 +119,14 @@ bool getRouteDescriptionCall (Map * map) {
         return false;
     }
     const char * description = getRouteDescription(map, (unsigned)routeId);
+    bool test = false;
     if (description) {
+        test = true;
         printf("%s\n", description);
     }
     freeIfNotNULL(description);
     freeIfNotNULL(id);
-    return description != NULL;
+    return test;
 }
 
 void realizeLine (Map * map, int lineNumber) {
@@ -132,7 +134,6 @@ void realizeLine (Map * map, int lineNumber) {
     int type = commandType(instr);
     if (type == INCORRECT_COMMAND) {
         checkEOL();
-        freeIfNotNULL(instr);
         fprintf(stderr, "ERROR %d\n", lineNumber);
     } else if (type == ADD) {
         if (!addRoadCall(map))
@@ -141,8 +142,9 @@ void realizeLine (Map * map, int lineNumber) {
         if (!repairRoadCall(map))
             fprintf(stderr, "ERROR %d\n", lineNumber);
     } else if (type == DESCRIPTION) {
-        if (!getRouteDescriptionCall(map))
+        if (!getRouteDescriptionCall(map)) {
             fprintf(stderr, "ERROR %d\n", lineNumber);
+        }
     } else {
         if (!routeCreation(map, (unsigned)type))
             fprintf(stderr, "ERROR %d\n", lineNumber);

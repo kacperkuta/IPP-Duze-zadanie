@@ -193,15 +193,6 @@ City * lastCityOfPath (Path * path) {
     }
 }
 
-bool idExists(Map * map, unsigned id) {
-    listOfRouteIDs * element = map -> IDs;
-    while (element) {
-        if (element -> routeID == id)
-            return true;
-        element = element -> next;
-    }
-    return false;
-}
 bool addIDToMap (unsigned id, Map * map, City * first) {
     listOfRouteIDs * new = malloc(sizeof(listOfRouteIDs));
     if (!new)

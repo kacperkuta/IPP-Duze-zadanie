@@ -73,4 +73,7 @@ City * getNextCityOfRoute (ListOfCities * origin, unsigned routeId, ListOfCities
  * @param copy Wskaźnik na kopię mapy.
  */
 void repairMap(Map * original, Map * copy);
+
+bool idExists(Map * map, unsigned id);
+
 #endif //DROGI_UTILITIES_H

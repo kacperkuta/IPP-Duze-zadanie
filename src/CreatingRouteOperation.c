@@ -17,6 +17,8 @@
 City * findRoad (Map * map, const char * city1, const char * city2) {
     int id1 = searchForCityID(city1, map ->  citiesID, map -> citiesIDLength);
     int id2 = searchForCityID(city2, map ->  citiesID, map -> citiesIDLength);
+    //printf("%s %s", city1, city2);
+    //printf("\n%d %d\n", id1, id2);
     return getRoad(map, id1, id2);
 }
 
@@ -38,13 +40,16 @@ element * readElement () {
         freeIfNotNULL(buildYearString);
         return NULL;
     }
-    if (!isNumber(distanceString) || !isNumber(buildYearString)) {
+
+    const char * city = readToSemicolon();
+    if (!isNumber(distanceString) || !isNumber(buildYearString) || !city) {
         checkEOL();
         freeIfNotNULL(distanceString);
         freeIfNotNULL(buildYearString);
+        freeIfNotNULL(city);
         return NULL;
     }
-    const char * city = readToSemicolon();
+
     int distance = convertStringToInteger(distanceString);
     int buildYear = convertStringToInteger(buildYearString);
 
@@ -79,8 +84,11 @@ void freeMemoryOfRoute (Route * r) {
 
 Route * firstElementCreating () {
     Route * first = malloc(sizeof(Route));
-    if (!first || !checkSemicolon())
+    if (!first || !checkSemicolon()) {
+        if (first)
+            free(first);
         return NULL;
+    }
     element * start = malloc(sizeof(element));
     if (!start) {
         free(first);
@@ -88,6 +96,7 @@ Route * firstElementCreating () {
     }
     start -> city = readToSemicolon();
     if (!(start->city)) {
+        free(start);
         free(first);
         checkEOL();
         return NULL;
@@ -106,8 +115,9 @@ Route * firstElementCreating () {
  */
 Route * readRouteToCreate () {
     Route * first = firstElementCreating();
+    if (!first)
+        return NULL;
     Route * route = first;
-
     int sign = ';';
     while (sign != '\n') {
         ungetc(sign, stdin);
@@ -131,6 +141,8 @@ Route * readRouteToCreate () {
 }
 
 bool checkIfRoadCorrect (Map * map, Route * previous, Route * next) {
+    if (next->road->distance <= 0 || next->road->buildYear == 0 || !strcmp(previous->road->city, next->road->city))
+        return false;
     City * road = findRoad(map, (previous->road->city), (next->road->city));
     if (!road)
         return true;
@@ -139,14 +151,29 @@ bool checkIfRoadCorrect (Map * map, Route * previous, Route * next) {
     return  !((road->buildYear) > (next->road->buildYear) || (next->road->buildYear) == 0);
 }
 
+bool checkCrossingOfRoute (Route * r, Route * city) {
+    while (r) {
+        if (r != city && !strcmp((city->road->city), (r->road->city))) {
+            return false;
+        }
+        r = r -> next;
+    }
+    return true;
+}
+
 bool checkIfRoutePossible (Map * map, Route * r) {
+    Route * start = r;
     if (!r)
         return false;
     bool test = true;
     while (test && r && r -> next) {
         test = checkIfRoadCorrect(map, r, r->next);
+        if (test)
+            test = checkCrossingOfRoute(start, r);
         r = r->next;
     }
+    if (test && r)
+        test = checkCrossingOfRoute(start, r);
     return test;
 }
 
@@ -181,12 +208,14 @@ bool takeActions (Map * map, Route * previous, Route * next, int routeId) {
 }
 
 bool routeCreation (Map * map, int routeId) {
-    Map * mapCopy = copyOfMap(map);
-    if (routeId >= 1000)
+    if (routeId >= 1000) {
+        checkEOL();
         return false;
+    }
+    Map * mapCopy = copyOfMap(map);
     Route * r = readRouteToCreate();
     Route * copy = r;
-    if (checkIfRoutePossible(map, r)) {
+    if (checkIfRoutePossible(map, r) && !idExists(map, (unsigned)routeId) ) {
         while (r && r->next) {
             bool test = takeActions(map, r, r->next, routeId);
             if (!test){

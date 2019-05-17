@@ -27,13 +27,14 @@ const char * readToSemicolon () {
         letter = getchar();
     }
     ungetc(letter, stdin);
-    if (inscription)
-        inscription[length-1] = '\0';
+    if (inscription) {
+        inscription[length - 1] = '\0';
+    }
     return inscription;
 }
 
 bool isNumber (const char * inscription) {
-    if (strlen(inscription) == 0)
+    if (!inscription || strlen(inscription) == 0)
         return false;
     bool test = true;
     for (unsigned long i = (unsigned)(inscription[0] == '-'); i < strlen(inscription) && test; i++) {

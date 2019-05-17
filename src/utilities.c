@@ -105,3 +105,12 @@ void repairMap(Map * original, Map * copy) {
     original -> IDs = copy -> IDs;
     free(copy);
 }
+bool idExists(Map * map, unsigned id) {
+    listOfRouteIDs * element = map -> IDs;
+    while (element) {
+        if (element -> routeID == id)
+            return true;
+        element = element -> next;
+    }
+    return false;
+}

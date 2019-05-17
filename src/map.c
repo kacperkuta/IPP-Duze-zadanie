@@ -50,7 +50,6 @@ void deleteMap(Map * map) {
 bool addRoad(Map * map, const char * city1, const char * city2, unsigned length, int buildYear) {
     if (!strcmp(city1, city2) || buildYear == 0 || length == 0)
         return false;
-
     int city1ID = searchForCityID(city1, map -> citiesID, map -> citiesIDLength);
     int city2ID = searchForCityID(city2, map -> citiesID, map -> citiesIDLength);
 
