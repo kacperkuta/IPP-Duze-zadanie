@@ -1,7 +1,7 @@
 /** @file
  * Interfejs klasy funkcji używanych do tworzenia opisów dróg krajowych.
  * @author Kacper Kuta <k.kuta2@student.uw.edu.pl>
- * @date 8.04.2019
+ * @date 8.05.2019
  */
 #ifndef DROGI_GETROUTEDESCRIPTION_H
 #define DROGI_GETROUTEDESCRIPTION_H

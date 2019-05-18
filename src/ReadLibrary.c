@@ -1,6 +1,3 @@
-//
-// Created by baka475 on 16.05.19.
-//
 #include "ReadLibrary.h"
 
 

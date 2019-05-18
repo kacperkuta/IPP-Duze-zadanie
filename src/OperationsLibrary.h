@@ -32,9 +32,11 @@ bool addRoadCall (Map * map);
 
 /** @brief Funkcja wywoływana w przypadku, gdy pierwsze polecenie w linii przed średnikiem to getRouteDescription.
  * Sprawdza poprawność danych wejściowych. Jeżeli gdzieś wystąpi błąd wczytuje aż do napotkania znaku końca linii lub końca pliku.
- * Jeżeli wszystkie dane są poprawne podejmuje próbę wywołania polecenia getRouteDescription.
+ * Jeżeli argument podany jako liczba jest z zakresu unsigned int to wywołuje polecenie getRouteDescription. W przeciwnym przypadku wypisuje ERROR na stderr.
+ * Jeżeli argumentów jest zbyt wiele także wypisuje ERROR na standardowe wyjście diagnostyczne.
  * @param map
- * @return @p false jeżeli dane wejściowe są niepoprawne lub wystąpi problem z alokacją pamięci. Wynik działania funkcji @ref getRouteDescription wpp.
+ * @return @p false jeżeli dane wejściowe są niepoprawne w opisany wyżej sposób lub wystąpi problem z alokacją pamięci.
+ * Wynik działania funkcji @ref getRouteDescription wpp.
 */
 bool getRouteDescriptionCall (Map * map);
 

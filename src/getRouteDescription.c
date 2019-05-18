@@ -1,10 +1,7 @@
-//
-// Created by baka475 on 28.04.19.
-//
-
 #include "getRouteDescription.h"
 #include <stdlib.h>
 #include <string.h>
+
 bool checkMemory(char ** description, int * length, int expectedLength) {
     if (*length < expectedLength) {
         (*length) = expectedLength * 2;
@@ -14,6 +11,7 @@ bool checkMemory(char ** description, int * length, int expectedLength) {
     }
     return true;
 }
+
 int howManyLetters(unsigned ID) {
     int multi = 10;
     int howMany = 1;
@@ -23,6 +21,7 @@ int howManyLetters(unsigned ID) {
     }
     return howMany;
 }
+
 void addIntToString(char * string, unsigned id, int * descLength) {
     int i = howManyLetters(id);
     (*descLength) += i + 1;
@@ -33,6 +32,7 @@ void addIntToString(char * string, unsigned id, int * descLength) {
     string[i] = ';';
     string[i+1] = '\0';
 }
+
 char * generateStringFromInt(int number) {
     int howLong = howManyLetters((unsigned)abs(number));
     if (number < 0)
@@ -57,6 +57,7 @@ char * generateStringFromInt(int number) {
     string[id + howLong] = '\0';
     return string;
 }
+
 bool addCityToDescription(Map * map, City * city, char ** description, int * size, int * descLength) {
     int cityId = city->cityID;
     char * end = ";";
@@ -94,6 +95,7 @@ bool addCityToDescription(Map * map, City * city, char ** description, int * siz
     free(builtYear);
     return true;
 }
+
 const char * generateEmpty (char * old) {
     free(old);
     char * empty = malloc(sizeof(char));
@@ -102,6 +104,7 @@ const char * generateEmpty (char * old) {
     empty[0] = '\0';
     return empty;
 }
+
 bool addFirstCity (Map * map, ListOfCities * city, char ** description, int * size, int * descLength) {
     const char * nameOfFirst = (map -> citiesID)[city -> cityID];
     int lengthOfFirst = (int)strlen(nameOfFirst);
